@@ -32,19 +32,24 @@ const UserLogin = () => {
 
     axios.post('http://localhost:8000/login', logd)
       .then((result) => {        
+        console.log(result.data.token);
+        
         if (result.data.message === "student") {
           localStorage.setItem("uid", result.data.data._id);
+          localStorage.setItem("token", result.data.token);
           localStorage.setItem("utype","student");
           navigate('/studenthome');
         }
         else if (result.data.message === "admin") {
           localStorage.setItem("utype","admin");
           localStorage.setItem("uid", result.data._id);
+          localStorage.setItem("token", result.data.token);
           navigate('/adminhome');
         }
         else if (result.data.message === "seeker") {
           localStorage.setItem("utype","seeker");
           localStorage.setItem("uid", result.data.data._id);
+          localStorage.setItem("token", result.data.token);
           navigate('/seekerhome');
         }
         else {

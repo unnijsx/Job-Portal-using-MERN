@@ -1,6 +1,7 @@
 const Student = require('../models/Student');
 const Seeker = require('../models/Seeker');
-
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "shhh";
 // Login (for Admin, Student, Seeker)
 const Login = async (req, res) => {
     const { username, password } = req.body;
@@ -8,14 +9,16 @@ const Login = async (req, res) => {
     try {
         // Admin login
         if (username === "admin@gmail.com" && password === "admin") {
-            return res.json({ message: "admin" });
+            const token = jwt.sign({ role: "admin", username }, SECRET_KEY, { expiresIn: "1d" });
+            return res.json({ message: "admin", token });
         }
 
         // Student login
         const student = await Student.findOne({ email: username });
         if (student) {
             if (student.password === password) {
-                return res.json({ message: "student", data: student });
+                const token = jwt.sign({ role: "student", id: student._id, email: student.email }, SECRET_KEY, { expiresIn: "1d" });
+                return res.json({ message: "student", data: student, token });
             } else {
                 return res.json({ message: "Incorrect password" });
             }
@@ -25,7 +28,8 @@ const Login = async (req, res) => {
         const seeker = await Seeker.findOne({ email: username });
         if (seeker) {
             if (seeker.password === password) {
-                return res.json({ message: "seeker", data: seeker });
+                const token = jwt.sign({ role: "seeker", id: seeker._id, email: seeker.email }, SECRET_KEY, { expiresIn: "1d" });
+                return res.json({ message: "seeker", data: seeker, token });
             } else {
                 return res.json({ message: "Incorrect password" });
             }
@@ -38,6 +42,7 @@ const Login = async (req, res) => {
         return res.status(500).json({ message: "Server error", error: err });
     }
 };
+
 const ForgotPass = async (req, res) => {
     const { username, password } = req.body;
 

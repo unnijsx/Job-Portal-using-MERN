@@ -1,4 +1,5 @@
 const Internship = require('../models/internshipSchema');
+const verifyToken = require('../middlewares/auth');
 
 const AddInternship = (req, res) => {
   const newInternship = new Internship({
@@ -61,18 +62,16 @@ const DeleteInternship = (req, res) => {
     });
 };
 
-const ViewInternship = (req, res) => {
+const ViewInternship = [verifyToken, (req, res) => {
   Internship.find()
     .then((result) => {
-      return res.json({
-        data: result
-      });
+      return res.json({ data: result });
     })
     .catch((error) => {
       console.log(error);
       return res.status(500).json({ message: "Fetch failed", error });
     });
-};
+}];
 
 const ViewSingleInternship = (req, res) => {
   Internship.findById(req.params.id)
